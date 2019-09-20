@@ -85,16 +85,18 @@ function Get-BrowserData {
         if (-not (Test-Path -Path $Path)) {
             Write-Verbose "[!] Could not find Chrome History for username: $UserName"
         }
-        $Regex = '(htt(p|s))://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)*?'
-        $Value = Get-Content -Path "$Env:systemdrive\Users\$UserName\AppData\Local\Google\Chrome\User Data\Default\History"|Select-String -AllMatches $regex |% {($_.Matches).Value} |Sort -Unique
-        $Value | ForEach-Object {
-            $Key = $_
-            if ($Key -match $Search){
-                New-Object -TypeName PSObject -Property @{
-                    User = $UserName
-                    Browser = 'Chrome'
-                    DataType = 'History'
-                    Data = $_
+        else{
+            $Regex = '(htt(p|s))://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)*?'
+            $Value = Get-Content -Path "$Env:systemdrive\Users\$UserName\AppData\Local\Google\Chrome\User Data\Default\History"|Select-String -AllMatches $regex |% {($_.Matches).Value} |Sort -Unique
+            $Value | ForEach-Object {
+                $Key = $_
+                if ($Key -match $Search){
+                    New-Object -TypeName PSObject -Property @{
+                        User = $UserName
+                        Browser = 'Chrome'
+                        DataType = 'History'
+                        Data = $_
+                    }
                 }
             }
         }        
@@ -193,15 +195,20 @@ function Get-BrowserData {
         else {
             $Profiles = Get-ChildItem -Path "$Path\*.default\" -ErrorAction SilentlyContinue
             $Regex = '(htt(p|s))://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)*?'
-            $Value = Get-Content $Profiles\places.sqlite | Select-String -Pattern $Regex -AllMatches |Select-Object -ExpandProperty Matches |Sort -Unique
-            $Value.Value |ForEach-Object {
-                if ($_ -match $Search) {
-                    ForEach-Object {
-                    New-Object -TypeName PSObject -Property @{
-                        User = $UserName
-                        Browser = 'Firefox'
-                        DataType = 'History'
-                        Data = $_
+            if (-not (Test-Path -Path $Profiles\places.sqlite)){
+            
+            }
+            else {
+                $Value = Get-Content $Profiles\places.sqlite | Select-String -Pattern $Regex -AllMatches |Select-Object -ExpandProperty Matches |Sort -Unique
+                $Value.Value |ForEach-Object {
+                    if ($_ -match $Search) {
+                        ForEach-Object {
+                            New-Object -TypeName PSObject -Property @{
+                                User = $UserName
+                                Browser = 'Firefox'
+                                DataType = 'History'
+                                Data = $_
+                            }
                         }    
                     }
                 }
