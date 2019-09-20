@@ -136,7 +136,7 @@ function Get-BrowserData {
             $Path = $Path | Select-Object -ExpandProperty PSPath
 
             $UserPath = "$Path\Software\Microsoft\Internet Explorer\TypedURLs"
-            if (-not (Test-Path -Path $UserPath)) {
+            if (!(Test-Path -Path $UserPath)) {
                 Write-Verbose "[!] Could not find IE History for SID: $Path"
             }
             else {
@@ -189,7 +189,7 @@ function Get-BrowserData {
 
     function Get-FireFoxHistory {
         $Path = "$Env:systemdrive\Users\$UserName\AppData\Roaming\Mozilla\Firefox\Profiles\"
-        if (-not (Test-Path -Path $Path)) {
+        if (!(Test-Path -Path $Path)) {
             Write-Verbose "[!] Could not find FireFox History for username: $UserName"
         }
         else {
